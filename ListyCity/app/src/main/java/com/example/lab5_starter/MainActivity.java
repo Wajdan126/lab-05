@@ -11,7 +11,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements CityDialogFragment.CityDialogListener {
 
@@ -20,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
 
     private ArrayList<City> cityArrayList;
     private ArrayAdapter<City> cityArrayAdapter;
+    private FirebaseFirestore db;
+    private CollectionReference citiesRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
         cityArrayAdapter = new CityArrayAdapter(this, cityArrayList);
         cityListView.setAdapter(cityArrayAdapter);
 
-        addDummyData();
+//        addDummyData();
 
         // set listeners
         addCityButton.setOnClickListener(view -> {
@@ -53,6 +60,28 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
             City city = cityArrayAdapter.getItem(i);
             CityDialogFragment cityDialogFragment = CityDialogFragment.newInstance(city);
             cityDialogFragment.show(getSupportFragmentManager(),"City Details");
+        });
+        cityListView.setOnItemLongClickListener((parent, view, position, id) -> {
+            City city = cityArrayAdapter.getItem(position);
+            if (city != null) {
+                citiesRef.document(city.getName()).delete();
+            }
+            return true;
+        });
+        db = FirebaseFirestore.getInstance();
+        citiesRef = db.collection("cities");
+
+        citiesRef.addSnapshotListener((value, error) -> {
+            if (error != null || value == null) return;
+
+            cityArrayList.clear();
+            for (QueryDocumentSnapshot doc : value) {
+                String name = doc.getId(); // if doc id is city name
+                String province = doc.getString("province");
+                if (province == null) province = "";
+                cityArrayList.add(new City(name, province));
+            }
+            cityArrayAdapter.notifyDataSetChanged();
         });
 
     }
@@ -67,10 +96,10 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
     }
 
     @Override
-    public void addCity(City city){
-        cityArrayList.add(city);
-        cityArrayAdapter.notifyDataSetChanged();
-
+    public void addCity(City city) {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("province", city.getProvince());
+        citiesRef.document(city.getName()).set(data);
     }
 
     public void addDummyData(){

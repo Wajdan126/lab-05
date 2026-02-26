@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "539301085634",
+    "project_id": "wajdan-s-project",
+    "storage_bucket": "wajdan-s-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539301085634:android:12520e54e491635271965b",
+        "android_client_info": {
+          "package_name": "com.example.lab5_starter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPFM1jaXDprwDymxT16kz-K_wuEHRSIFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
